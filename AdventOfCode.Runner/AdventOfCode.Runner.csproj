@@ -5,4 +5,8 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\AdventOfCode.Day01\AdventOfCode.Day01.fsproj" />
+  </ItemGroup>
+
 </Project>
