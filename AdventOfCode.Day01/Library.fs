@@ -6,7 +6,6 @@ module Puzzles =
 
     let rec calculateMassP2 number =
         let mass = calculateMassP1 number
-        let result = 0
 
         match mass with
         | mass when mass <= 0.0f -> 0.0f

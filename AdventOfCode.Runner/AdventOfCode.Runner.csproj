@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AdventOfCode.Day01\AdventOfCode.Day01.fsproj" />
+    <ProjectReference Include="..\AdventOfCode.Day02\AdventOfCode.Day02.fsproj" />
   </ItemGroup>
 
 </Project>
