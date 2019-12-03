@@ -20,20 +20,20 @@ namespace AdventOfCode.Runner
             Console.WriteLine(separator);
             Console.WriteLine();
 
-            int day = args.Length > 0 ? ParseDay(args[0], 0, solved) : 0;
+            //int day = args.Length > 0 ? ParseDay(args[0], 0, solved) : 0;
 
-            if (day == 0)
-            {
-                Console.Write("Which day you would like to run? ");
+            //if (day == 0)
+            //{
+            //    Console.Write("Which day you would like to run? ");
                 
-                string input = Console.ReadLine();
-                day = ParseDay(input, 0, solved);
-            }
+            //    string input = Console.ReadLine();
+            //    day = ParseDay(input, 0, solved);
+            //}
 
-            if (day == 0)
-                return;
+            //if (day == 0)
+            //    return;
 
-            AdventOfCode.Day02.Puzzles.puzzles(@"C:\Shared\AdventOfCode2019\Data\Day02\input.txt");
+            AdventOfCode.Day03.Puzzles.puzzles(@"C:\Shared\AdventOfCode2019\Data\Day03\input.txt");
 
             Console.WriteLine();
 
