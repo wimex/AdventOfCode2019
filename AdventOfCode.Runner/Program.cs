@@ -33,7 +33,7 @@ namespace AdventOfCode.Runner
             //if (day == 0)
             //    return;
 
-            AdventOfCode.Day03.Puzzles.puzzles(@"C:\Shared\AdventOfCode2019\Data\Day03\input.txt");
+            AdventOfCode.Day03.Puzzles.puzzles(@"D:\Repositories\AdventOfCode2019\AdventOfCode.Runner\App_Data\Day03\input.txt");
 
             Console.WriteLine();
 
