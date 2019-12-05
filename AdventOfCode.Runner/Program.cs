@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using AdventOfCode.Shared;
 using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Reflection;
 
 namespace AdventOfCode.Runner
 {
@@ -11,8 +14,12 @@ namespace AdventOfCode.Runner
     {
         public static void Main(string[] args)
         {
-            const int solved = 1;
-
+            List<Type> solutions = new List<Type>
+            {
+                typeof(AdventOfCode.Day01.Puzzles), typeof(AdventOfCode.Day02.Puzzles), typeof(AdventOfCode.Day03.Puzzles),
+                typeof(AdventOfCode.Day04.Puzzles), typeof(AdventOfCode.Day05.Puzzles)
+            };
+        
             string header = "Advent of Code 2019";
             string separator = new string('=', header.Length);
 
@@ -20,20 +27,29 @@ namespace AdventOfCode.Runner
             Console.WriteLine(separator);
             Console.WriteLine();
 
-            //int day = args.Length > 0 ? ParseDay(args[0], 0, solved) : 0;
+            Console.Write("Which day you would like to run (or type 0 to exit)? ");
 
-            //if (day == 0)
-            //{
-            //    Console.Write("Which day you would like to run? ");
-                
-            //    string input = Console.ReadLine();
-            //    day = ParseDay(input, 0, solved);
-            //}
+            string input = Console.ReadLine();
+            if (input == "0")
+                return;
 
-            //if (day == 0)
-            //    return;
+            if (!ParseDay(input, 1, solutions.Count, out int day))
+                return;
 
-            var v = AdventOfCode.Intcode.Computer.execute;
+            string ident = day.ToString().PadLeft(2, '0');
+            string filename = $"App_Data{Path.DirectorySeparatorChar}day{ident}.txt";
+            string library = $"AdventOfCode.Day{ident}.Puzzles";
+
+            Type type = solutions[day - 1];
+            MethodInfo method = type.GetMethod("puzzles");
+            if (method == null)
+            {
+                Console.WriteLine("Unable to locate entry method");
+                return;
+            }
+
+            Console.WriteLine();
+            method.Invoke(null, new object[] {filename});
 
             Console.WriteLine();
 
@@ -44,15 +60,22 @@ namespace AdventOfCode.Runner
             Console.ReadKey();
         }
 
-        private static int ParseDay(string input, int lower, int upper)
+        private static bool ParseDay(string input, int lower, int upper, out int day)
         {
-            if (!int.TryParse(input, out int day))
-                return 0;
+            if (!int.TryParse(input, out int temp))
+            {
+                day = 0;
+                return false;
+            }
 
-            if (day <= lower || day > upper)
-                return 0;
+            if (temp < lower || temp > upper)
+            {
+                day = 0;
+                return false;
+            }
 
-            return day;
+            day = temp;
+            return true;
         }
     }
 }

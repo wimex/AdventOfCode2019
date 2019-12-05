@@ -5,11 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="Library.fs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\AdventOfCode.Shared\AdventOfCode.Shared.fsproj" />
+    <Compile Include="IPuzzle.fs" />
+    <Compile Include="Intcode.fs" />
   </ItemGroup>
 
 </Project>

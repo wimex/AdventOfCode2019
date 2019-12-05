@@ -76,8 +76,10 @@ module Puzzles =
         else
             (mcount1, mcount2)
 
-    let puzzles filename =
+    let puzzles (filename: string) =
         let (m1, m2) = getMatches 0 0 lower higher
 
         printfn "%d numbers match criteria 1" m1
         printfn "%d numbers match criteria 2" m2
+
+        filename
