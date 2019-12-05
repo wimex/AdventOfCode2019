@@ -36,7 +36,7 @@ module Computer =
             Instruction.Address = address;
             Instruction.Mode1 = mode1;
             Instruction.Mode2 = mode2;
-            Instruction.Mode3 = mode3
+            Instruction.Mode3 = mode3;
          }
 
     let getValue address mode (opcodes: List<int32>) =
@@ -55,21 +55,24 @@ module Computer =
         |  1 ->
             printfn "# %d %d %d %d" opcodes.[instruction.Address] opcodes.[instruction.Address + 1] opcodes.[instruction.Address + 2] opcodes.[instruction.Address + 3]
 
-            let value1 = getValue (instruction.Address + 1) instruction.Mode1 opcodes
-            let value2 = getValue (instruction.Address + 2) instruction.Mode2 opcodes
+            let operand1 = getValue (instruction.Address + 1) instruction.Mode1 opcodes
+            let operand2 = getValue (instruction.Address + 2) instruction.Mode2 opcodes
 
-            let result = value1 + value2
-            let next = setValue (opcodes.[instruction.Address + 3]) result opcodes
-            
+            let value = operand1 + operand2
+            let target = opcodes.[instruction.Address + 3]
+
+            let next = setValue target value opcodes
             (instruction.Address + 4, next)
         |  2 ->
             printfn "# %d %d %d %d" opcodes.[instruction.Address] opcodes.[instruction.Address + 1] opcodes.[instruction.Address + 2] opcodes.[instruction.Address + 3]
 
-            let value1 = getValue (instruction.Address + 1) instruction.Mode1 opcodes
-            let value2 = getValue (instruction.Address + 2) instruction.Mode2 opcodes
+            let operand1 = getValue (instruction.Address + 1) instruction.Mode1 opcodes
+            let operand2 = getValue (instruction.Address + 2) instruction.Mode2 opcodes
 
-            let result = value1 * value2
-            let next = setValue (opcodes.[instruction.Address + 3]) result opcodes
+            let value = operand1 * operand2
+            let target = opcodes.[instruction.Address + 3]
+
+            let next = setValue target value opcodes
             (instruction.Address + 4, next)
         |  3 ->
             printfn "# %d %d" opcodes.[instruction.Address] opcodes.[instruction.Address + 1]
@@ -81,7 +84,6 @@ module Computer =
             
             if parsed then
                 let next = setValue opcodes.[instruction.Address + 1] value opcodes
-
                 (instruction.Address + 2, next)
             else
                 (instruction.Address, opcodes)
@@ -93,38 +95,40 @@ module Computer =
         |  5 ->
             printfn "# %d %d %d" opcodes.[instruction.Address] opcodes.[instruction.Address + 1] opcodes.[instruction.Address + 2]
 
-            let value1 = getValue (instruction.Address + 1) instruction.Mode1 opcodes
-            let value2 = getValue (instruction.Address + 2) instruction.Mode2 opcodes
+            let operand1 = getValue (instruction.Address + 1) instruction.Mode1 opcodes
+            let operand2 = getValue (instruction.Address + 2) instruction.Mode2 opcodes
 
-            let next = if value1 <> 0 then value2 else instruction.Address + 3
-            (next, opcodes)
+            let value = if operand1 <> 0 then operand2 else instruction.Address + 3
+            (value, opcodes)
         |  6 ->
             printfn "# %d %d %d" opcodes.[instruction.Address] opcodes.[instruction.Address + 1] opcodes.[instruction.Address + 2]
 
-            let value1 = getValue (instruction.Address + 1) instruction.Mode1 opcodes
-            let value2 = getValue (instruction.Address + 2) instruction.Mode2 opcodes
+            let operand1 = getValue (instruction.Address + 1) instruction.Mode1 opcodes
+            let operand2 = getValue (instruction.Address + 2) instruction.Mode2 opcodes
 
-            let next = if value1 = 0 then value2 else instruction.Address + 3
-            (next, opcodes)
+            let value = if operand1 = 0 then operand2 else instruction.Address + 3
+            (value, opcodes)
         |  7 ->
             printfn "# %d %d %d %d" opcodes.[instruction.Address] opcodes.[instruction.Address + 1] opcodes.[instruction.Address + 2] opcodes.[instruction.Address + 3]
 
-            let value1 = getValue (instruction.Address + 1) instruction.Mode1 opcodes
-            let value2 = getValue (instruction.Address + 2) instruction.Mode2 opcodes
-            let value3 = getValue (instruction.Address + 3) 1 opcodes
+            let operand1 = getValue (instruction.Address + 1) instruction.Mode1 opcodes
+            let operand2 = getValue (instruction.Address + 2) instruction.Mode2 opcodes
 
-            let result = if value1 < value2 then 1 else 0
-            let next = setValue value3 result opcodes
+            let value = if operand1 < operand2 then 1 else 0
+            let target = getValue (instruction.Address + 3) 1 opcodes
+
+            let next = setValue target value opcodes
             (instruction.Address + 4, next)
         |  8 ->
             printfn "# %d %d %d %d" opcodes.[instruction.Address] opcodes.[instruction.Address + 1] opcodes.[instruction.Address + 2] opcodes.[instruction.Address + 3]
 
-            let value1 = getValue (instruction.Address + 1) instruction.Mode1 opcodes
-            let value2 = getValue (instruction.Address + 2) instruction.Mode2 opcodes
-            let value3 = getValue (instruction.Address + 3) 1 opcodes
+            let operand1 = getValue (instruction.Address + 1) instruction.Mode1 opcodes
+            let operand2 = getValue (instruction.Address + 2) instruction.Mode2 opcodes
 
-            let result = if value1 = value2 then 1 else 0
-            let next = setValue value3 result opcodes
+            let value = if operand1 = operand2 then 1 else 0
+            let target = getValue (instruction.Address + 3) 1 opcodes
+
+            let next = setValue target value opcodes
             (instruction.Address + 4, next)
         | 99 -> (-1, opcodes)
         |  _ -> raise(Exception("Unknown instruction"))
