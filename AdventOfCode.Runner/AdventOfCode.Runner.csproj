@@ -10,6 +10,7 @@
     <ProjectReference Include="..\AdventOfCode.Day02\AdventOfCode.Day02.fsproj" />
     <ProjectReference Include="..\AdventOfCode.Day03\AdventOfCode.Day03.fsproj" />
     <ProjectReference Include="..\AdventOfCode.Day04\AdventOfCode.Day04.fsproj" />
+    <ProjectReference Include="..\AdventOfCode.Intcode\AdventOfCode.Intcode.fsproj" />
   </ItemGroup>
 
 </Project>

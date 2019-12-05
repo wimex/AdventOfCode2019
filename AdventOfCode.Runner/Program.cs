@@ -33,7 +33,7 @@ namespace AdventOfCode.Runner
             //if (day == 0)
             //    return;
 
-            AdventOfCode.Day04.Puzzles.puzzles("");
+            var v = AdventOfCode.Intcode.Computer.execute;
 
             Console.WriteLine();
 
