@@ -8,7 +8,7 @@ module Puzzles =
         let start1 = AdventOfCode.Shared.Intcode.poke opcodes 1 noun
         let start2 = AdventOfCode.Shared.Intcode.poke start1 2 verb
         
-        let result = AdventOfCode.Shared.Intcode.execute 0 start2
+        let (_, result) = AdventOfCode.Shared.Intcode.execute 0 start2 null null
         let nextNoun = if verb = opcodes.Length - 1 then noun + 1 else noun
         let nextVerb = if verb = opcodes.Length - 1 then 0 else verb + 1
         
@@ -21,7 +21,7 @@ module Puzzles =
         let start1 = AdventOfCode.Shared.Intcode.poke opcodes 1 12
         let start2 = AdventOfCode.Shared.Intcode.poke start1 2 2
         
-        let result = AdventOfCode.Shared.Intcode.execute 0 start2
+        let (_, result) = AdventOfCode.Shared.Intcode.execute 0 start2 null null
         printfn "Final element in position 0: %d" result.[0]
 
     let puzzle2 opcodes =

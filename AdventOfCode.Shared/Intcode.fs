@@ -15,6 +15,12 @@ module Intcode =
             Mode3: int32
         }
 
+    type Autoinput =
+        {
+            Text: int32
+            Remove: bool
+        }
+
     let poke list address value =
         list |> List.mapi (fun i v -> if i = address then value else v)
     
@@ -58,7 +64,7 @@ module Intcode =
     let setValue address value (opcodes: List<int32>) = 
         poke opcodes address value
 
-    let parseInstruction instruction (opcodes: List<int32>) =
+    let parseInstruction instruction (opcodes: List<int32>) (inputFunction: Func<string>) (outputFunction: Action<string>) =
         //printfn ". %s %d %d %d" (instruction.Opcode.ToString().PadLeft(5, '0')) instruction.Mode1 instruction.Mode2 instruction.Mode3
 
         match instruction.Opcode with
@@ -89,8 +95,12 @@ module Intcode =
 
             printf "? "
 
-            let input = Console.ReadLine();
+            let auto = inputFunction <> null
+            let input = if auto then inputFunction.Invoke() else Console.ReadLine();
             let (parsed, value) = Int32.TryParse(input)
+
+            if auto then
+                printfn "%s" input
             
             if parsed then
                 let next = setValue opcodes.[instruction.Address + 1] value opcodes
@@ -100,7 +110,12 @@ module Intcode =
         |  4 ->
             printDiagnostics [ opcodes.[instruction.Address]; opcodes.[instruction.Address + 1]; ]
 
-            printfn "! %d" (getValue (instruction.Address + 1) instruction.Mode1 opcodes)
+            let output = getValue (instruction.Address + 1) instruction.Mode1 opcodes
+            printfn "! %d" output
+
+            if outputFunction <> null then
+                outputFunction.Invoke(output.ToString())
+
             (instruction.Address + 2, opcodes)
         |  5 ->
             printDiagnostics [ opcodes.[instruction.Address]; opcodes.[instruction.Address + 1]; opcodes.[instruction.Address + 2]; ]
@@ -143,11 +158,11 @@ module Intcode =
         | 99 -> (-1, opcodes)
         |  _ -> raise(Exception("Unknown instruction"))
 
-    let rec execute address opcodes =
+    let rec execute address opcodes inputFunction outputFunction =
         let instruction = getInstruction address opcodes
-        let (na, no) = parseInstruction instruction opcodes
+        let (na, nc) = parseInstruction instruction opcodes inputFunction outputFunction
 
         if na < 0 then
-            no
+            (na, nc)
         else
-            execute na no
+            execute na nc inputFunction outputFunction

@@ -17,7 +17,8 @@ namespace AdventOfCode.Runner
             List<Type> solutions = new List<Type>
             {
                 typeof(AdventOfCode.Day01.Puzzles), typeof(AdventOfCode.Day02.Puzzles), typeof(AdventOfCode.Day03.Puzzles),
-                typeof(AdventOfCode.Day04.Puzzles), typeof(AdventOfCode.Day05.Puzzles)
+                typeof(AdventOfCode.Day04.Puzzles), typeof(AdventOfCode.Day05.Puzzles), null,
+                typeof(AdventOfCode.Day07.Puzzles)
             };
         
             string header = "Advent of Code 2019";

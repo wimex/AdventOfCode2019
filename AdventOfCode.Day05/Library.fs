@@ -11,12 +11,12 @@ module Puzzles =
         printfn "Question 1 - please type 1 at the prompt"
         printfn "======================================"
         printfn ""
-        let memory1 = AdventOfCode.Shared.Intcode.execute 0 opcodes
+        let (memory1, _) = AdventOfCode.Shared.Intcode.execute 0 opcodes null null
 
         printfn ""
         printfn "Question 2 - please type 5 at the prompt"
         printfn "======================================"
         printfn ""
-        let memory2 = AdventOfCode.Shared.Intcode.execute 0 opcodes
+        let (memory2, _) = AdventOfCode.Shared.Intcode.execute 0 opcodes null null
 
         (memory1, memory2)
