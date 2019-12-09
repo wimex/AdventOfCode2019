@@ -12,6 +12,7 @@
     <ProjectReference Include="..\AdventOfCode.Day04\AdventOfCode.Day04.fsproj" />
     <ProjectReference Include="..\AdventOfCode.Day05\AdventOfCode.Day05.fsproj" />
     <ProjectReference Include="..\AdventOfCode.Day07\AdventOfCode.Day07.fsproj" />
+    <ProjectReference Include="..\AdventOfCode.Day08\AdventOfCode.Day08.fsproj" />
     <ProjectReference Include="..\AdventOfCode.Intcode\AdventOfCode.Intcode.fsproj" />
     <ProjectReference Include="..\AdventOfCode.Shared\AdventOfCode.Shared.fsproj" />
   </ItemGroup>
@@ -30,6 +31,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="App_Data\day07.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="App_Data\day08.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
