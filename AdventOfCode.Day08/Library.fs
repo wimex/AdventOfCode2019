@@ -71,4 +71,4 @@ module Puzzles =
                 if blend.[c,r] = 1 then printf "*" else
                 printf " "
             
-            printfn""
+            printfn ""
