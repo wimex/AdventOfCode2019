@@ -3,6 +3,10 @@
 open System
 
 module Puzzles =
+    type Tree =
+    | Leaf of string
+    | Node of string * List<Tree>
+
     type Node =
         {
             Name: string
@@ -18,10 +22,21 @@ module Puzzles =
             else
                 findNode (List.append nodes node.Children) name
 
-    let rec createTree lines root =
-        ""
-        //if List.length lines = 0 then root
-        //else
+    //let rec createTree lines root =
+    //    match (lines, root) with
+    //    | ([], root) -> root
+    //    | ()
+
+    //    if List.length lines = 0 then root
+    //    else
+    //        let (left, right) = List.head lines
+
+    //        let oldparent = findNode root left
+    //        let oldchild = findNode root right
+
+    //        let test=Node ("hello", List.Empty)
+            
+    //        ""
         //    let (left, right) = List.head lines
         //    let oldparent = findNode root left
         //    let oldchild = findNode root right
@@ -46,8 +61,8 @@ module Puzzles =
             length + (walk (List.head node.Children) length + 1)
 
     let puzzles filename = 
-        ""
         //let lines = System.IO.File.ReadAllLines filename |> List.ofSeq |> List.map (fun item -> (item |> string).Split(")")) |> List.map (fun item -> (item.[0], item.[1]))
+        //let tree = createTree lines
         //let tree = createTree lines Map.empty
         //let root = tree |> Map.filter (fun key value -> value.Parent.IsNone) |> Map.toList
 
@@ -56,3 +71,4 @@ module Puzzles =
         //let (_, node) = root.Head
         //let length = walk node 0
         //printfn "Tree length: %d" length
+        ""
