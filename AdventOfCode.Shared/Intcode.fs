@@ -58,10 +58,14 @@ module Intcode =
         | 0L -> if opcodes.ContainsKey opcodes.[address] then opcodes.[opcodes.[address]] else 0L
         | 1L -> if opcodes.ContainsKey address then opcodes.[address] else 0L
         | 2L -> if opcodes.ContainsKey (rbase + opcodes.[address]) then opcodes.[rbase + opcodes.[address]] else 0L
-        | _ -> raise(Exception("Unknown addressing mode"))
+        | _ -> raise(Exception("Unable to read in unknown addressing mode"))
 
-    let setValue address value (opcodes: Map<int64, int64>) = 
-        poke opcodes address value
+    let setValue address mode rbase value (opcodes: Map<int64, int64>) =
+        match mode with
+        | 0L -> poke opcodes opcodes.[address] value
+        | 1L -> poke opcodes address value
+        | 2L -> poke opcodes (rbase + opcodes.[address]) value
+        |  _ -> raise(Exception("Unable to write in unknown addressing mode"))
 
     let getInstruction address (opcodes: Map<int64, int64>) =
         let opcode = opcodes.[address]
@@ -83,7 +87,6 @@ module Intcode =
         //printfn ". %s %d %d %d" (instruction.Opcode.ToString().PadLeft(5, '0')) instruction.Mode1 instruction.Mode2 instruction.Mode3
         let instruction = cpu.Instruction
         let memory = cpu.Memory
-        let address = cpu.Address
 
         match instruction.Opcode with
         |  1L ->
@@ -93,9 +96,9 @@ module Intcode =
             let operand2 = getValue (cpu.Address + 2L) instruction.Mode2 cpu.RelativeBase memory
 
             let value = operand1 + operand2
-            let target = memory.[cpu.Address + 3L]
+            let target = cpu.Address + 3L
             
-            let nextMemory = setValue target value memory
+            let nextMemory = setValue target instruction.Mode3 cpu.RelativeBase value memory
             let nextAddress = cpu.Address + 4L
             let nextInstruction = getInstruction nextAddress nextMemory
             {
@@ -113,9 +116,9 @@ module Intcode =
             let operand2 = getValue (cpu.Address + 2L) instruction.Mode2 cpu.RelativeBase memory
 
             let value = operand1 * operand2
-            let target = memory.[cpu.Address + 3L]
+            let target = cpu.Address + 3L
             
-            let nextMemory = setValue target value memory
+            let nextMemory = setValue target instruction.Mode3 cpu.RelativeBase value memory
             let nextAddress = cpu.Address + 4L
             let nextInstruction = getInstruction nextAddress nextMemory
             {
@@ -133,7 +136,7 @@ module Intcode =
                 printfn "? %d" cpu.Data.Value
 
                 let nextAddress = cpu.Address + 2L
-                let nextMemory = setValue memory.[cpu.Address + 1L] cpu.Data.Value memory
+                let nextMemory = setValue (cpu.Address + 1L) instruction.Mode1 cpu.RelativeBase cpu.Data.Value memory
                 let nextInstruction = getInstruction nextAddress nextMemory
                 {
                     CPU.State = Execute;
@@ -212,7 +215,7 @@ module Intcode =
             let target = getValue (cpu.Address + 3L) 1L cpu.RelativeBase memory
 
             let nextAddress = cpu.Address + 4L
-            let nextMemory = setValue target value memory
+            let nextMemory = setValue target 1L cpu.RelativeBase value memory
             let nextInstruction = getInstruction nextAddress nextMemory
             {
                 CPU.State = Execute;
@@ -232,7 +235,7 @@ module Intcode =
             let target = getValue (cpu.Address + 3L) 1L cpu.RelativeBase memory
             
             let nextAddress = cpu.Address + 4L
-            let nextMemory = setValue target value memory
+            let nextMemory = setValue target 1L cpu.RelativeBase value memory
             let nextInstruction = getInstruction nextAddress nextMemory
             {
                 CPU.State = Execute;
@@ -245,8 +248,10 @@ module Intcode =
         |  9L ->
             printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1L]; ]
             
+            let relativeBaseModifier = getValue (cpu.Address + 1L) instruction.Mode1 cpu.RelativeBase memory
+
             let nextAddress = cpu.Address + 2L
-            let nextRelativeBase = cpu.RelativeBase + memory.[cpu.Address + 1L]
+            let nextRelativeBase = cpu.RelativeBase + relativeBaseModifier
             let nextInstruction = getInstruction nextAddress memory
             {
                 CPU.State = Execute;
@@ -257,6 +262,8 @@ module Intcode =
                 CPU.Data = None;
             }
         | 99L ->
+            printDiagnostics [ memory.[cpu.Address]; ]
+
             {
                 CPU.State = Halt;
                 CPU.Instruction = cpu.Instruction;
