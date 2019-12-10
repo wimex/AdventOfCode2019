@@ -16,7 +16,7 @@ namespace AdventOfCode.Runner
         {
             List<Type> solutions = new List<Type>
             {
-                typeof(AdventOfCode.Day01.Puzzles), typeof(AdventOfCode.Day02.Puzzles), typeof(AdventOfCode.Day03.Puzzles),
+                typeof(AdventOfCode.Day01.Puzzles), null, typeof(AdventOfCode.Day03.Puzzles),
                 typeof(AdventOfCode.Day04.Puzzles), typeof(AdventOfCode.Day05.Puzzles), typeof(AdventOfCode.Day06.Puzzles),
                 null, typeof(AdventOfCode.Day08.Puzzles), typeof(AdventOfCode.Day09.Puzzles)
             };

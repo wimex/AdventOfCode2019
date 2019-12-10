@@ -8,13 +8,13 @@ module Intcode =
 
     type Instruction = 
         {
-            Opcode: int32
-            Mode1: int32
-            Mode2: int32
-            Mode3: int32
+            Opcode: int64
+            Mode1: int64
+            Mode2: int64
+            Mode3: int64
         }
     with
-        static member Default = { Opcode = 0; Mode1 = 0; Mode2 = 0; Mode3 = 0 }
+        static member Default = { Opcode = 0L; Mode1 = 0L; Mode2 = 0L; Mode3 = 0L }
 
     type State =
     | Noop
@@ -28,21 +28,21 @@ module Intcode =
         {
             State: State
             Instruction: Instruction
-            Address: int32
-            RelativeBase: int32
-            Memory: List<int32>
+            Address: int64
+            RelativeBase: int64
+            Memory: Map<int64, int64>
             Data: 'A option
         }
     with
-        static member Default = { State = Noop; Instruction = Instruction.Default; Address = 0; RelativeBase = 0; Memory = List.Empty; Data = None }
+        static member Default = { State = Noop; Instruction = Instruction.Default; Address = 0L; RelativeBase = 0L; Memory = Map.empty; Data = None }
 
-    let poke list address value =
-        list |> List.mapi (fun i v -> if i = address then value else v)
+    let poke (map: Map<int64, int64>) address value =
+        map.Add(address, value)
     
     let rec getDigits number =
-        if number <> 0 then
-            let modulo = number % 10
-            getDigits((number - modulo) / 10) @ [modulo]
+        if number <> 0L then
+            let modulo = number % 10L
+            getDigits((number - modulo) / 10L) @ [modulo]
         else
             List.Empty
 
@@ -53,24 +53,24 @@ module Intcode =
                 printf "%d " item
             printfn ""
 
-    let getValue address mode rbase (opcodes: List<int32>) =
+    let getValue address mode rbase (opcodes: Map<int64, int64>) =
         match mode with
-        | 0 -> opcodes.[opcodes.[address]]
-        | 1 -> opcodes.[address]
-        | 2 -> opcodes.[rbase + opcodes.[address]]
+        | 0L -> if opcodes.ContainsKey opcodes.[address] then opcodes.[opcodes.[address]] else 0L
+        | 1L -> if opcodes.ContainsKey address then opcodes.[address] else 0L
+        | 2L -> if opcodes.ContainsKey (rbase + opcodes.[address]) then opcodes.[rbase + opcodes.[address]] else 0L
         | _ -> raise(Exception("Unknown addressing mode"))
 
-    let setValue address value (opcodes: List<int32>) = 
+    let setValue address value (opcodes: Map<int64, int64>) = 
         poke opcodes address value
 
-    let getInstruction address (opcodes: List<int32>) =
+    let getInstruction address (opcodes: Map<int64, int64>) =
         let opcode = opcodes.[address]
         let digits = getDigits opcode
 
-        let instruction = if digits.Length >= 2 then 10 * digits.[digits.Length - 2] + digits.[digits.Length - 1] else digits.[digits.Length - 1]
-        let mode1 = if digits.Length >= 3 then digits.[digits.Length - 3] else 0
-        let mode2 = if digits.Length >= 4 then digits.[digits.Length - 4] else 0
-        let mode3 = if digits.Length >= 5 then digits.[digits.Length - 5] else 0
+        let instruction = if digits.Length >= 2 then 10L * digits.[digits.Length - 2] + digits.[digits.Length - 1] else digits.[digits.Length - 1]
+        let mode1 = if digits.Length >= 3 then digits.[digits.Length - 3] else 0L
+        let mode2 = if digits.Length >= 4 then digits.[digits.Length - 4] else 0L
+        let mode3 = if digits.Length >= 5 then digits.[digits.Length - 5] else 0L
 
         {
             Instruction.Opcode = instruction;
@@ -86,17 +86,17 @@ module Intcode =
         let address = cpu.Address
 
         match instruction.Opcode with
-        |  1 ->
-            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1]; memory.[cpu.Address + 2]; memory.[cpu.Address + 3]; ]
+        |  1L ->
+            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1L]; memory.[cpu.Address + 2L]; memory.[cpu.Address + 3L]; ]
 
-            let operand1 = getValue (cpu.Address + 1) instruction.Mode1 cpu.RelativeBase memory
-            let operand2 = getValue (cpu.Address + 2) instruction.Mode2 cpu.RelativeBase memory
+            let operand1 = getValue (cpu.Address + 1L) instruction.Mode1 cpu.RelativeBase memory
+            let operand2 = getValue (cpu.Address + 2L) instruction.Mode2 cpu.RelativeBase memory
 
             let value = operand1 + operand2
-            let target = memory.[cpu.Address + 3]
+            let target = memory.[cpu.Address + 3L]
             
             let nextMemory = setValue target value memory
-            let nextAddress = cpu.Address + 4
+            let nextAddress = cpu.Address + 4L
             let nextInstruction = getInstruction nextAddress nextMemory
             {
                 CPU.State = Execute;
@@ -106,17 +106,17 @@ module Intcode =
                 CPU.Memory = nextMemory;
                 CPU.Data = None;
             }
-        |  2 ->
-            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1]; memory.[cpu.Address + 2]; memory.[cpu.Address + 3]; ]
+        |  2L ->
+            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1L]; memory.[cpu.Address + 2L]; memory.[cpu.Address + 3L]; ]
 
-            let operand1 = getValue (cpu.Address + 1) instruction.Mode1 cpu.RelativeBase memory
-            let operand2 = getValue (cpu.Address + 2) instruction.Mode2 cpu.RelativeBase memory
+            let operand1 = getValue (cpu.Address + 1L) instruction.Mode1 cpu.RelativeBase memory
+            let operand2 = getValue (cpu.Address + 2L) instruction.Mode2 cpu.RelativeBase memory
 
             let value = operand1 * operand2
-            let target = memory.[cpu.Address + 3]
+            let target = memory.[cpu.Address + 3L]
             
             let nextMemory = setValue target value memory
-            let nextAddress = cpu.Address + 4
+            let nextAddress = cpu.Address + 4L
             let nextInstruction = getInstruction nextAddress nextMemory
             {
                 CPU.State = Execute;
@@ -126,14 +126,14 @@ module Intcode =
                 CPU.Memory = nextMemory;
                 CPU.Data = None;
             }
-        |  3 ->
-            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1]; ]
+        |  3L ->
+            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1L]; ]
 
             if cpu.Data.IsSome then
                 printfn "? %d" cpu.Data.Value
 
-                let nextAddress = cpu.Address + 2
-                let nextMemory = setValue memory.[cpu.Address + 1] cpu.Data.Value memory
+                let nextAddress = cpu.Address + 2L
+                let nextMemory = setValue memory.[cpu.Address + 1L] cpu.Data.Value memory
                 let nextInstruction = getInstruction nextAddress nextMemory
                 {
                     CPU.State = Execute;
@@ -154,13 +154,13 @@ module Intcode =
                     CPU.Memory = memory;
                     CPU.Data = None;
                 }
-        |  4 ->
-            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1]; ]
+        |  4L ->
+            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1L]; ]
 
-            let output = getValue (cpu.Address + 1) instruction.Mode1 cpu.RelativeBase memory
+            let output = getValue (cpu.Address + 1L) instruction.Mode1 cpu.RelativeBase memory
             printfn "! %d" output
 
-            let nextAddress = cpu.Address + 2
+            let nextAddress = cpu.Address + 2L
             let nextInstruction = getInstruction nextAddress memory
             {
                 CPU.State = Output;
@@ -170,13 +170,13 @@ module Intcode =
                 CPU.Memory = memory;
                 CPU.Data = Some(output);
             }
-        |  5 ->
-            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1]; memory.[cpu.Address + 2]; ]
+        |  5L ->
+            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1L]; memory.[cpu.Address + 2L]; ]
 
-            let operand1 = getValue (cpu.Address + 1) instruction.Mode1 cpu.RelativeBase memory
-            let operand2 = getValue (cpu.Address + 2) instruction.Mode2 cpu.RelativeBase memory
+            let operand1 = getValue (cpu.Address + 1L) instruction.Mode1 cpu.RelativeBase memory
+            let operand2 = getValue (cpu.Address + 2L) instruction.Mode2 cpu.RelativeBase memory
 
-            let nextAddress = if operand1 <> 0 then operand2 else cpu.Address + 3
+            let nextAddress = if operand1 <> 0L then operand2 else cpu.Address + 3L
             let nextInstruction = getInstruction nextAddress memory
             {
                 CPU.State = Execute;
@@ -186,13 +186,13 @@ module Intcode =
                 CPU.Memory = memory;
                 CPU.Data = None;
             }
-        |  6 ->
-            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1]; memory.[cpu.Address + 2]; ]
+        |  6L ->
+            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1L]; memory.[cpu.Address + 2L]; ]
 
-            let operand1 = getValue (cpu.Address + 1) instruction.Mode1 cpu.RelativeBase memory
-            let operand2 = getValue (cpu.Address + 2) instruction.Mode2 cpu.RelativeBase memory
+            let operand1 = getValue (cpu.Address + 1L) instruction.Mode1 cpu.RelativeBase memory
+            let operand2 = getValue (cpu.Address + 2L) instruction.Mode2 cpu.RelativeBase memory
 
-            let nextAddress = if operand1 = 0 then operand2 else cpu.Address + 3
+            let nextAddress = if operand1 = 0L then operand2 else cpu.Address + 3L
             let nextInstruction = getInstruction nextAddress memory
             {
                 CPU.State = Execute;
@@ -202,16 +202,16 @@ module Intcode =
                 CPU.Memory = memory;
                 CPU.Data = None;
             }
-        |  7 ->
-            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1]; memory.[cpu.Address + 2]; memory.[cpu.Address + 3]; ]
+        |  7L ->
+            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1L]; memory.[cpu.Address + 2L]; memory.[cpu.Address + 3L]; ]
 
-            let operand1 = getValue (cpu.Address + 1) instruction.Mode1 cpu.RelativeBase memory
-            let operand2 = getValue (cpu.Address + 2) instruction.Mode2 cpu.RelativeBase memory
+            let operand1 = getValue (cpu.Address + 1L) instruction.Mode1 cpu.RelativeBase memory
+            let operand2 = getValue (cpu.Address + 2L) instruction.Mode2 cpu.RelativeBase memory
 
-            let value = if operand1 < operand2 then 1 else 0
-            let target = getValue (cpu.Address + 3) 1 cpu.RelativeBase memory
+            let value = if operand1 < operand2 then 1L else 0L
+            let target = getValue (cpu.Address + 3L) 1L cpu.RelativeBase memory
 
-            let nextAddress = cpu.Address + 4
+            let nextAddress = cpu.Address + 4L
             let nextMemory = setValue target value memory
             let nextInstruction = getInstruction nextAddress nextMemory
             {
@@ -222,16 +222,16 @@ module Intcode =
                 CPU.Memory = nextMemory;
                 CPU.Data = None;
             }
-        |  8 ->
-            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1]; memory.[cpu.Address + 2]; memory.[cpu.Address + 3]; ]
+        |  8L ->
+            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1L]; memory.[cpu.Address + 2L]; memory.[cpu.Address + 3L]; ]
 
-            let operand1 = getValue (cpu.Address + 1) instruction.Mode1 cpu.RelativeBase memory
-            let operand2 = getValue (cpu.Address + 2) instruction.Mode2 cpu.RelativeBase memory
+            let operand1 = getValue (cpu.Address + 1L) instruction.Mode1 cpu.RelativeBase memory
+            let operand2 = getValue (cpu.Address + 2L) instruction.Mode2 cpu.RelativeBase memory
 
-            let value = if operand1 = operand2 then 1 else 0
-            let target = getValue (cpu.Address + 3) 1 cpu.RelativeBase memory
+            let value = if operand1 = operand2 then 1L else 0L
+            let target = getValue (cpu.Address + 3L) 1L cpu.RelativeBase memory
             
-            let nextAddress = cpu.Address + 4
+            let nextAddress = cpu.Address + 4L
             let nextMemory = setValue target value memory
             let nextInstruction = getInstruction nextAddress nextMemory
             {
@@ -242,11 +242,11 @@ module Intcode =
                 CPU.Memory = nextMemory;
                 CPU.Data = None;
             }
-        |  9 ->
-            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1]; ]
+        |  9L ->
+            printDiagnostics [ memory.[cpu.Address]; memory.[cpu.Address + 1L]; ]
             
-            let nextAddress = cpu.Address + 2
-            let nextRelativeBase = cpu.RelativeBase + memory.[cpu.Address + 1]
+            let nextAddress = cpu.Address + 2L
+            let nextRelativeBase = cpu.RelativeBase + memory.[cpu.Address + 1L]
             let nextInstruction = getInstruction nextAddress memory
             {
                 CPU.State = Execute;
@@ -256,7 +256,7 @@ module Intcode =
                 CPU.Memory = memory;
                 CPU.Data = None;
             }
-        | 99 ->
+        | 99L ->
             {
                 CPU.State = Halt;
                 CPU.Instruction = cpu.Instruction;

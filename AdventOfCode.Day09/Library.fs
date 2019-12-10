@@ -3,20 +3,26 @@
 open AdventOfCode.Shared.Intcode
 
 module Puzzles =
-    let rec runToCompletition cpu =
-        if cpu.State = Halt then cpu
-        else
+    let rec runToCompletition cpu inputs =
+        match cpu.State with
+        | Halt  -> cpu
+        | Input ->
+            let cpu = { CPU.State = cpu.State; CPU.Instruction = cpu.Instruction; CPU.Address = cpu.Address;CPU.RelativeBase = cpu.RelativeBase; CPU.Memory = cpu.Memory; CPU.Data = Some(List.head inputs)}
             let state = AdventOfCode.Shared.Intcode.execute cpu
-            runToCompletition state
+            runToCompletition state (List.skip 1 inputs)
+        | _     ->
+            let state = AdventOfCode.Shared.Intcode.execute cpu
+            runToCompletition state inputs
 
     let puzzles filename = 
         let line = System.IO.File.ReadAllText filename
         let opcodes = line.Split(",", System.StringSplitOptions.RemoveEmptyEntries) 
                         |> List.ofSeq 
-                        |> List.map(Operators.int)
+                        |> List.indexed
+                        |> List.map(fun (i,j) -> (int64(i), int64(j)))
+                        |> Map.ofSeq
                        
-        let memory = Array.zeroCreate 34463338 |> List.ofSeq
-        let cpu =  { CPU.State = Boot; CPU.Instruction = Instruction.Default; CPU.Address = 0; CPU.RelativeBase = 0; CPU.Memory = List.append opcodes memory; CPU.Data = None }
-        let status = runToCompletition cpu
+        let cpu =  { CPU.State = Boot; CPU.Instruction = Instruction.Default; CPU.Address = 0L; CPU.RelativeBase = 0L; CPU.Memory = opcodes; CPU.Data = None }
+        let status = runToCompletition cpu [1L]
 
         status
