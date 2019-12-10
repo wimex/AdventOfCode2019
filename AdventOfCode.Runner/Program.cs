@@ -18,7 +18,7 @@ namespace AdventOfCode.Runner
             {
                 typeof(AdventOfCode.Day01.Puzzles), typeof(AdventOfCode.Day02.Puzzles), typeof(AdventOfCode.Day03.Puzzles),
                 typeof(AdventOfCode.Day04.Puzzles), typeof(AdventOfCode.Day05.Puzzles), typeof(AdventOfCode.Day06.Puzzles),
-                null, typeof(AdventOfCode.Day08.Puzzles)
+                null, typeof(AdventOfCode.Day08.Puzzles), typeof(AdventOfCode.Day09.Puzzles)
             };
         
             string header = "Advent of Code 2019";

@@ -10,7 +10,7 @@ module Puzzles =
         let start1 = AdventOfCode.Shared.Intcode.poke opcodes 1 noun
         let start2 = AdventOfCode.Shared.Intcode.poke start1 2 verb
 
-        let cpu = { CPU.State = Boot; CPU.Instruction = Instruction.Default; CPU.Address = 0; CPU.Memory = start2; CPU.Data = None }
+        let cpu = { CPU.State = Boot; CPU.Instruction = Instruction.Default; CPU.Address = 0; CPU.RelativeBase = 0; CPU.Memory = start2; CPU.Data = None }
         let result = AdventOfCode.Shared.Intcode.execute cpu
         let nextNoun = if verb = opcodes.Length - 1 then noun + 1 else noun
         let nextVerb = if verb = opcodes.Length - 1 then 0 else verb + 1
@@ -24,7 +24,7 @@ module Puzzles =
         let start1 = AdventOfCode.Shared.Intcode.poke opcodes 1 12
         let start2 = AdventOfCode.Shared.Intcode.poke start1 2 2
         
-        let cpu = { CPU.State = Boot; CPU.Instruction = Instruction.Default; CPU.Address = 0; CPU.Memory = start2; CPU.Data = None }
+        let cpu = { CPU.State = Boot; CPU.Instruction = Instruction.Default; CPU.Address = 0; CPU.RelativeBase = 0; CPU.Memory = start2; CPU.Data = None }
         let result = AdventOfCode.Shared.Intcode.execute cpu
         printfn "Final element in position 0: %d" result.Memory.[0]
 
