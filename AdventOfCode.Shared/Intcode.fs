@@ -305,3 +305,13 @@ module Intcode =
             execute result
         else
             result
+
+    let read filename =
+        let line = System.IO.File.ReadAllText filename
+        let opcodes = line.Split(",", System.StringSplitOptions.RemoveEmptyEntries) 
+                        |> List.ofSeq 
+                        |> List.indexed
+                        |> List.map(fun (i,j) -> (int64(i), int64(j)))
+                        |> Map.ofSeq
+
+        opcodes
