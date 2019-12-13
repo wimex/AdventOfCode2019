@@ -4,7 +4,7 @@ open System
 
 module Intcode =
     [<Literal>]
-    let debugmode = true
+    let debugmode = false
 
     type Instruction = 
         {
@@ -70,7 +70,7 @@ module Intcode =
     let setValue (opcodes: Map<int64, int64>) rbase mode operand value =
         match mode with
         | 0L -> poke opcodes operand value
-        | 2L -> poke opcodes (opcodes.[rbase + operand]) value
+        | 2L -> poke opcodes (rbase + operand) value
         |  _ -> raise(Exception("Unable to write in unknown addressing mode"))
 
     let getInstructionLength instruction =
