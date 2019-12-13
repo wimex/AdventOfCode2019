@@ -176,8 +176,6 @@ module Intcode =
                     CPU.Data = None
                 }
             else
-                printfn "? ?"
-
                 {
                     CPU.State = Input;
                     CPU.Instruction = instruction
